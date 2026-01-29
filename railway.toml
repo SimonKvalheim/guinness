@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [build.env]
-NODE_VERSION = "20.9.0"
+NODE_VERSION = "22.12.0"
 
 [deploy]
 startCommand = "npm run start"
