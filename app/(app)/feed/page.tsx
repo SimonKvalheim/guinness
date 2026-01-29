@@ -33,10 +33,14 @@ export default function FeedPage() {
   const fetchSplits = async () => {
     try {
       const response = await fetch(`/api/splits?sort=${sort}&limit=20`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
       const data = await response.json();
-      setSplits(data.splits);
+      setSplits(data.splits || []);
     } catch (error) {
       console.error('Error fetching splits:', error);
+      setSplits([]);
     } finally {
       setLoading(false);
     }

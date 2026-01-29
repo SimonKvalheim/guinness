@@ -53,10 +53,14 @@ export default function SplitDetailPage() {
   const fetchSplit = async () => {
     try {
       const response = await fetch(`/api/splits/${params.id}`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
       const data = await response.json();
-      setSplit(data.split);
+      setSplit(data.split || null);
     } catch (error) {
       console.error('Error fetching split:', error);
+      setSplit(null);
     } finally {
       setLoading(false);
     }
