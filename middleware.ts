@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // Skip middleware for health check endpoint
+  if (request.nextUrl.pathname === '/api/health') {
+    return NextResponse.next();
+  }
+
   const response = NextResponse.next();
 
   // Security headers
