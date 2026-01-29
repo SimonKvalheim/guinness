@@ -1,36 +1,165 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# G-Splits - Guinness Splits Rating App
+
+A mobile-first web application where users can upload photos of themselves sharing Guinness pints with friends, receive AI-generated ratings and humorous feedback, and compete on various leaderboards.
+
+## Features
+
+- 🍺 Upload photos of Guinness splits
+- 🤖 AI-powered ratings and witty feedback using Claude
+- 🏆 Multiple leaderboards (Best Split, Average Rating, Most Active)
+- 💬 Comment on splits
+- 👤 User profiles with statistics
+- 📱 Mobile-first responsive design
+
+## Tech Stack
+
+- **Frontend**: Next.js 14+, React, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: NextAuth.js
+- **AI**: Anthropic Claude API (Vision)
+- **Storage**: Railway Volumes
+- **Hosting**: Railway
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+
+- npm or yarn
+- PostgreSQL database
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd guinness-splits
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env` and add your values:
+- `DATABASE_URL`: PostgreSQL connection string
+- `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
+- `NEXTAUTH_URL`: Your app URL (http://localhost:3000 for development)
+- `ANTHROPIC_API_KEY`: Your Anthropic API key
 
-## Learn More
+4. Set up the database:
+```bash
+npx prisma db push
+npx prisma generate
+```
 
-To learn more about Next.js, take a look at the following resources:
+5. Run the development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment to Railway
 
-## Deploy on Vercel
+1. Install Railway CLI:
+```bash
+npm install -g @railway/cli
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. Login to Railway:
+```bash
+railway login
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. Initialize Railway project:
+```bash
+railway init
+```
+
+4. Add PostgreSQL database:
+```bash
+railway add
+# Select PostgreSQL
+```
+
+5. Set environment variables in Railway dashboard:
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL` (your Railway app URL)
+- `ANTHROPIC_API_KEY`
+- `UPLOAD_DIR=/app/uploads`
+
+6. Create a volume for uploads:
+- Go to Railway dashboard
+- Add a volume mounted at `/app/uploads`
+
+7. Deploy:
+```bash
+git push
+```
+
+## Project Structure
+
+```
+guinness-splits/
+├── app/
+│   ├── (auth)/          # Authentication pages
+│   ├── (app)/           # Main app pages
+│   ├── api/             # API routes
+│   └── layout.tsx       # Root layout
+├── components/          # React components
+│   ├── ui/              # Reusable UI components
+│   └── ...
+├── lib/                 # Utility libraries
+│   ├── db.ts            # Prisma client
+│   ├── auth.ts          # NextAuth config
+│   ├── claude.ts        # Claude AI integration
+│   └── storage.ts       # File upload handling
+├── prisma/
+│   └── schema.prisma    # Database schema
+└── public/
+    └── uploads/         # Uploaded images
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/[...nextauth]` - NextAuth handlers
+
+### Splits
+- `GET /api/splits` - Get splits feed
+- `GET /api/splits/[id]` - Get single split
+- `POST /api/splits/upload` - Upload new split
+
+### Comments
+- `POST /api/comments` - Create comment
+- `DELETE /api/comments/[id]` - Delete comment
+
+### Leaderboard
+- `GET /api/leaderboard` - Get leaderboard
+
+### Users
+- `GET /api/users/[username]` - Get user profile
+- `GET /api/users/me` - Get current user
+- `PATCH /api/users/me` - Update profile
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT
+
+## Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/)
+- AI powered by [Anthropic Claude](https://www.anthropic.com/)
+- Hosted on [Railway](https://railway.app/)

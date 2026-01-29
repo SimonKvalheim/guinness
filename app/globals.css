@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Guinness color palette */
+  --guinness-black: #000000;
+  --guinness-cream: #F4E8D8;
+  --guinness-gold: #FFD700;
+  --guinness-dark-cream: #D4C4B0;
+
+  --background: var(--guinness-black);
+  --foreground: var(--guinness-cream);
+  --accent: var(--guinness-gold);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+/* Mobile-first optimizations */
+@media (max-width: 768px) {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  * {
+    -webkit-touch-callout: none;
+  }
+}
+
+/* Ensure images are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--guinness-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--guinness-cream);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--guinness-gold);
 }
