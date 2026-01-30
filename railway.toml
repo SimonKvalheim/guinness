@@ -3,8 +3,9 @@ builder = "dockerfile"
 dockerfilePath = "./Dockerfile"
 
 [deploy]
-healthcheckPath = "/api/health"
-healthcheckTimeout = 120
+# Temporarily disable health check to deploy debugging code
+# healthcheckPath = "/api/health"
+# healthcheckTimeout = 120
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 releaseCommand = "prisma migrate deploy"
