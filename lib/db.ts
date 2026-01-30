@@ -13,6 +13,11 @@ const createPrismaClient = () => {
   // This allows Next.js to build without a real database connection
   const connectionString = process.env.DATABASE_URL || 'postgresql://build:build@localhost:5432/build';
 
+  // Validate that we have a proper connection string in production
+  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+    throw new Error('DATABASE_URL environment variable is not set in production');
+  }
+
   // Configure WebSocket for serverless environment (required for Neon adapter)
   neonConfig.webSocketConstructor = ws;
 
