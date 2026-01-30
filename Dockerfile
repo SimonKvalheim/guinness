@@ -10,7 +10,6 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 # Copy Prisma files needed for postinstall script
 COPY prisma ./prisma
-COPY prisma.config.ts ./prisma.config.ts
 RUN npm ci
 
 # Rebuild the source code only when needed
@@ -43,7 +42,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-# Note: prisma.config.ts and prisma/ are only needed for migrations/build, not runtime
+# Note: prisma/ directory is only needed for migrations/build, not runtime
 
 # Create uploads directory
 RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
