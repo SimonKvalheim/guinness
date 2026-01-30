@@ -19,10 +19,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Accept DATABASE_URL as build arg (Railway will provide this)
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Build the application
+# Build the application with DATABASE_URL available
 RUN npm run build
 
 # Production image, copy all the files and run next

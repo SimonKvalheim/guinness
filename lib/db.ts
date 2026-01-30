@@ -11,8 +11,13 @@ const globalForPrisma = globalThis as unknown as {
 const createPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL;
 
+  // During build time, DATABASE_URL might not be available
+  // Create a client that will only fail when actually used, not during import
   if (!connectionString) {
-    throw new Error('DATABASE_URL environment variable is not set');
+    // Return a basic client that will fail at query time with a helpful error
+    return new PrismaClient({
+      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    });
   }
 
   // Use Neon adapter only for Neon databases (connection string contains 'neon' or uses prisma+postgres)
