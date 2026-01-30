@@ -17,6 +17,11 @@ const createPrismaClient = () => {
   // This ensures we get the runtime value, not the build-time value
   const connectionString = process.env.DATABASE_URL;
 
+  // Debug logging
+  console.log('DATABASE_URL type:', typeof connectionString);
+  console.log('DATABASE_URL value (masked):', connectionString ? `${connectionString.slice(0, 20)}...` : 'undefined');
+  console.log('All env keys:', Object.keys(process.env).filter(k => k.includes('DATABASE') || k.includes('RAILWAY')));
+
   // Use a placeholder during build if DATABASE_URL is not set
   if (!connectionString) {
     throw new Error('DATABASE_URL environment variable is required');
