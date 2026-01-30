@@ -33,6 +33,7 @@ RUN npm install -g prisma
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/start.sh ./start.sh
 
@@ -41,6 +42,7 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/@neondatabase ./node_modules/@neondatabase
 COPY --from=builder /app/node_modules/ws ./node_modules/ws
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 
 # Remove any env files (Railway injects environment at runtime)
 RUN rm -f .env .env.local .env.production
