@@ -9,18 +9,32 @@ const globalForPrisma = globalThis as unknown as {
 
 // For Prisma 7, we need to use an adapter
 const createPrismaClient = () => {
-  // Configure WebSocket for serverless environment
-  neonConfig.webSocketConstructor = ws;
+  const connectionString = process.env.DATABASE_URL;
 
-  // Create adapter with connection string directly
-  const connectionString = process.env.DATABASE_URL!;
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaNeon(pool as any); // Type assertion to work around type mismatch
+  if (!connectionString) {
+    throw new Error('DATABASE_URL environment variable is not set');
+  }
 
-  return new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  });
+  // Use Neon adapter only for Neon databases (connection string contains 'neon' or uses prisma+postgres)
+  const useNeonAdapter = connectionString.includes('neon') || connectionString.startsWith('prisma+postgres');
+
+  if (useNeonAdapter) {
+    // Configure WebSocket for serverless environment
+    neonConfig.webSocketConstructor = ws;
+
+    const pool = new Pool({ connectionString });
+    const adapter = new PrismaNeon(pool as any);
+
+    return new PrismaClient({
+      adapter,
+      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    });
+  } else {
+    // Use standard Prisma Client for regular PostgreSQL (like Railway)
+    return new PrismaClient({
+      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    });
+  }
 };
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
