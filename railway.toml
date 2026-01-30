@@ -7,4 +7,4 @@ healthcheckPath = "/api/health"
 healthcheckTimeout = 120
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
-releaseCommand = "sh /app/migrate.sh"
+# releaseCommand temporarily disabled - run migrations manually via Railway dashboard
