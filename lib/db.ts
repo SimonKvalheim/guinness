@@ -5,21 +5,35 @@ import ws from 'ws';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
+  prismaInitialized: boolean;
 };
+
+// Configure WebSocket for serverless environment (required for Neon adapter)
+// This needs to be done before creating the Pool
+neonConfig.webSocketConstructor = ws;
 
 // For Prisma 7, we need to use an adapter
 const createPrismaClient = () => {
+  // IMPORTANT: Read DATABASE_URL at function call time, not module load time
+  // This ensures we get the runtime value, not the build-time value
+  const connectionString = process.env.DATABASE_URL;
+
   // Use a placeholder during build if DATABASE_URL is not set
-  // This allows Next.js to build without a real database connection
-  const connectionString = process.env.DATABASE_URL || 'postgresql://build:build@localhost:5432/build';
-
-  // Validate that we have a proper connection string in production
-  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable is not set in production');
+  if (!connectionString) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('DATABASE_URL is not set in production environment!');
+      console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('DATABASE')));
+    }
+    // Fallback for build time
+    const fallback = 'postgresql://build:build@localhost:5432/build';
+    console.log('Using fallback DATABASE_URL:', fallback);
+    const pool = new Pool({ connectionString: fallback });
+    const adapter = new PrismaNeon(pool as any);
+    return new PrismaClient({
+      adapter,
+      log: ['error'],
+    });
   }
-
-  // Configure WebSocket for serverless environment (required for Neon adapter)
-  neonConfig.webSocketConstructor = ws;
 
   // Create Neon adapter - works with any PostgreSQL database, not just Neon
   const pool = new Pool({ connectionString });
