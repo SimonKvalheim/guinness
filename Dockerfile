@@ -34,6 +34,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/start.sh ./start.sh
 
 # Explicitly copy Prisma runtime packages (standalone may miss these)
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
@@ -44,8 +45,11 @@ COPY --from=builder /app/node_modules/ws ./node_modules/ws
 # Remove any env files (Railway injects environment at runtime)
 RUN rm -f .env .env.local .env.production
 
+# Make start script executable
+RUN chmod +x /app/start.sh
+
 # Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["node", "server.js"]
+# Start the application with debug script
+CMD ["/app/start.sh"]
