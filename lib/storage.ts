@@ -8,6 +8,19 @@ const UPLOAD_DIR = process.env.UPLOAD_DIR || './public/uploads';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
 
+// Helper to determine if uploads are served via API route or static files
+function getImageUrl(filename: string): string {
+  // If UPLOAD_DIR is outside public/ (like Railway volume at /app/uploads),
+  // use the API route to serve files. Otherwise, use static file serving.
+  const isExternalVolume = UPLOAD_DIR.startsWith('/app/') ||
+                          !UPLOAD_DIR.includes('public');
+
+  if (isExternalVolume) {
+    return `/api/uploads/${filename}`;
+  }
+  return `/uploads/${filename}`;
+}
+
 export interface UploadResult {
   filename: string;
   path: string;
@@ -64,7 +77,7 @@ export async function saveUploadedImage(
   return {
     filename: finalFilename,
     path: finalPath,
-    url: `/uploads/${finalFilename}`,
+    url: getImageUrl(finalFilename),
   };
 }
 
@@ -91,7 +104,7 @@ export async function saveImageBuffer(
   return {
     filename,
     path: filepath,
-    url: `/uploads/${filename}`,
+    url: getImageUrl(filename),
   };
 }
 
