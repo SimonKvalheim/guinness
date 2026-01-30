@@ -13,26 +13,17 @@ const createPrismaClient = () => {
   // This allows Next.js to build without a real database connection
   const connectionString = process.env.DATABASE_URL || 'postgresql://build:build@localhost:5432/build';
 
-  // Use Neon adapter only for Neon databases (connection string contains 'neon' or uses prisma+postgres)
-  const useNeonAdapter = connectionString.includes('neon') || connectionString.startsWith('prisma+postgres');
+  // Configure WebSocket for serverless environment (required for Neon adapter)
+  neonConfig.webSocketConstructor = ws;
 
-  if (useNeonAdapter) {
-    // Configure WebSocket for serverless environment
-    neonConfig.webSocketConstructor = ws;
+  // Create Neon adapter - works with any PostgreSQL database, not just Neon
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaNeon(pool as any);
 
-    const pool = new Pool({ connectionString });
-    const adapter = new PrismaNeon(pool as any);
-
-    return new PrismaClient({
-      adapter,
-      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    });
-  } else {
-    // Use standard Prisma Client for regular PostgreSQL (like Railway)
-    return new PrismaClient({
-      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    });
-  }
+  return new PrismaClient({
+    adapter,
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  });
 };
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
