@@ -5,7 +5,6 @@ import ws from 'ws';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
-  prismaInitialized: boolean;
 };
 
 // Configure WebSocket for serverless environment (required for Neon adapter)
@@ -20,19 +19,7 @@ const createPrismaClient = () => {
 
   // Use a placeholder during build if DATABASE_URL is not set
   if (!connectionString) {
-    if (process.env.NODE_ENV === 'production') {
-      console.error('DATABASE_URL is not set in production environment!');
-      console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('DATABASE')));
-    }
-    // Fallback for build time
-    const fallback = 'postgresql://build:build@localhost:5432/build';
-    console.log('Using fallback DATABASE_URL:', fallback);
-    const pool = new Pool({ connectionString: fallback });
-    const adapter = new PrismaNeon(pool as any);
-    return new PrismaClient({
-      adapter,
-      log: ['error'],
-    });
+    throw new Error('DATABASE_URL environment variable is required');
   }
 
   // Create Neon adapter - works with any PostgreSQL database, not just Neon
@@ -45,6 +32,23 @@ const createPrismaClient = () => {
   });
 };
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+// Lazy initialization - don't create client until first access
+function getPrismaClient() {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrismaClient();
+  }
+  return globalForPrisma.prisma;
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+// Export a Proxy to intercept all property accesses and ensure client is initialized
+export const prisma = new Proxy({} as PrismaClient, {
+  get(target, prop) {
+    const client = getPrismaClient();
+    const value = client[prop as keyof PrismaClient];
+    // If it's a function, bind it to the client
+    if (typeof value === 'function') {
+      return value.bind(client);
+    }
+    return value;
+  },
+});
