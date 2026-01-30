@@ -55,6 +55,7 @@ COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 # Copy prisma.config.ts and schema for migrations (releaseCommand)
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/migrate.sh ./migrate.sh
 
 # Create uploads directory
 RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
