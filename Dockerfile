@@ -37,13 +37,9 @@ COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/start.sh ./start.sh
 
-# Explicitly copy Prisma and database packages (standalone may miss these)
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/@neondatabase ./node_modules/@neondatabase
-COPY --from=builder /app/node_modules/ws ./node_modules/ws
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/effect ./node_modules/effect
+# Copy full node_modules for migrations and runtime
+# Standalone output may miss some packages, so copy everything
+COPY --from=builder /app/node_modules ./node_modules
 
 # Remove any env files (Railway injects environment at runtime)
 RUN rm -f .env .env.local .env.production
