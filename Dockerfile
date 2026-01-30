@@ -43,8 +43,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+# Note: prisma.config.ts and prisma/ are only needed for migrations/build, not runtime
 
 # Create uploads directory
 RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
