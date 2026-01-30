@@ -8,4 +8,4 @@ dockerfilePath = "./Dockerfile"
 # healthcheckTimeout = 120
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
-releaseCommand = "prisma migrate deploy"
+# releaseCommand = "prisma migrate deploy"
