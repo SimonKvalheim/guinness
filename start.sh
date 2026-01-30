@@ -3,7 +3,7 @@
 
 echo "==================== ENVIRONMENT DEBUG ===================="
 echo "NODE_ENV: $NODE_ENV"
-echo "DATABASE_URL (first 30 chars): ${DATABASE_URL:0:30}..."
+echo "DATABASE_URL exists: $(if [ -n "$DATABASE_URL" ]; then echo "YES"; else echo "NO"; fi)"
 echo "RAILWAY_ENVIRONMENT: $RAILWAY_ENVIRONMENT"
 echo "PORT: $PORT"
 echo ""
