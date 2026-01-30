@@ -50,6 +50,11 @@ COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/clie
 COPY --from=builder /app/node_modules/@prisma/adapter-neon ./node_modules/@prisma/adapter-neon
 COPY --from=builder /app/node_modules/@neondatabase/serverless ./node_modules/@neondatabase/serverless
 COPY --from=builder /app/node_modules/ws ./node_modules/ws
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+
+# Copy prisma.config.ts and schema for migrations (releaseCommand)
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /app/prisma ./prisma
 
 # Create uploads directory
 RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
